@@ -10,26 +10,98 @@
   <script src="js/chess-0.10.2.min.js"></script>
   <script src="js/stockfish.js"></script>
   <style>
-    body { background:#1c1c1c; color:#fff; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; overflow:hidden }
-    h1 { margin:0 0 10px }
-    #menu { background:#2a2a2a; padding:16px; border-radius:10px; width:480px; max-width:95vw }
-    #menu h2 { margin:0 0 8px; font-size:18px }
-    #menu select, #menu button { width:100%; padding:10px; margin:8px 0; font-size:16px; border-radius:8px; border:1px solid #444; background:#1f1f1f; color:#fff }
-    #gameArea { display:flex; flex-direction:row; gap:20px; margin-top:18px; }
-    #board { width:480px; max-width:95vw; }
-    #controls { display:none; margin-top:12px; width:480px; max-width:95vw }
-    #controls button { width:100%; padding:10px; font-size:16px; border-radius:8px; border:1px solid #444; background:#1f1f1f; color:#fff }
-    #moveList { width:200px; max-height:500px; overflow-y:auto; background:#2a2a2a; padding:10px; border-radius:8px; font-size:14px; }
-    #moveList h3 { margin-top:0; font-size:16px; }
+    body { 
+      background:#1c1c1c; 
+      color:#fff; 
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
+      display:flex; 
+      flex-direction:column; 
+      align-items:center; 
+      padding:12px; 
+      overflow-x:hidden;
+    }
+    h1 { margin:0 0 10px; font-size:6vw; text-align:center; }
+
+    #menu { 
+      background:#2a2a2a; 
+      padding:16px; 
+      border-radius:10px; 
+      width:100%; 
+      max-width:500px; 
+    }
+    #menu h2 { margin:0 0 8px; font-size:1rem; }
+    #menu select, #menu button { 
+      width:100%; 
+      padding:12px; 
+      margin:8px 0; 
+      font-size:1rem; 
+      border-radius:8px; 
+      border:1px solid #444; 
+      background:#1f1f1f; 
+      color:#fff; 
+    }
+
+    #gameArea { 
+      display:flex; 
+      flex-direction:row; 
+      gap:16px; 
+      margin-top:18px; 
+      width:100%;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    #board { 
+      width:90vw; 
+      max-width:480px; 
+      margin:auto; 
+    }
+
+    #controls { 
+      display:none; 
+      margin-top:12px; 
+      width:100%; 
+      max-width:500px; 
+    }
+    #controls button { 
+      width:100%; 
+      padding:12px; 
+      font-size:1rem; 
+      border-radius:8px; 
+      border:1px solid #444; 
+      background:#1f1f1f; 
+      color:#fff; 
+    }
+
+    #moveList { 
+      flex:1; 
+      min-width:200px; 
+      max-width:300px; 
+      max-height:400px; 
+      overflow-y:auto; 
+      background:#2a2a2a; 
+      padding:10px; 
+      border-radius:8px; 
+      font-size:0.9rem; 
+    }
+    #moveList h3 { margin-top:0; font-size:1rem; text-align:center; }
     table { width:100%; border-collapse:collapse; }
     th, td { text-align:center; padding:4px; border-bottom:1px solid #444; }
+
     .highlight { box-shadow: inset 0 0 0 3px red !important }
-    #status { margin-top:12px; font-size:18px; font-weight:bold; color:#f59e0b; display:none; text-align:center; }
-    #newGameBtn { margin-top:12px; padding:10px; font-size:16px; border-radius:8px; border:1px solid #444; background:#f59e0b; color:#000; display:none; cursor:pointer; }
+    #status { margin-top:12px; font-size:1.1rem; font-weight:bold; color:#f59e0b; display:none; text-align:center; }
+    #newGameBtn { margin-top:12px; padding:12px; font-size:1rem; border-radius:8px; border:1px solid #444; background:#f59e0b; color:#000; display:none; cursor:pointer; width:100%; max-width:500px; }
+
     .emoji { position:fixed; font-size:2rem; pointer-events:none; animation: fall 3s linear forwards; }
     @keyframes fall {
       from { transform: translateY(-50px) rotate(0deg); opacity:1; }
       to { transform: translateY(100vh) rotate(720deg); opacity:0; }
+    }
+
+    /* 📱 Mobile tweaks */
+    @media (max-width:600px) {
+      #gameArea { flex-direction:column; align-items:center; }
+      #moveList { width:90%; max-width:95vw; margin-top:12px; }
+      h1 { font-size:7vw; }
     }
   </style>
 </head>
