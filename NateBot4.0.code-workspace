@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../../Downloads/chessboardjs-master/website/js"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "NateBot4.0"
+	}
+}
