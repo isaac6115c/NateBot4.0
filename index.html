@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NateBot 4.0</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/css/chessboard-1.0.0.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/js/chessboard-1.0.0.min.js"></script>
+  <style>
+    body{font-family:Arial,sans-serif;background:#1c1c1c;color:#eee;display:flex;flex-direction:column;align-items:center;padding:10px}
+    #board{width:400px;height:400px;margin:20px auto}
+    .controls{margin:10px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+    select,input,button{padding:5px}
+    #suggestion{margin-top:10px;color:#ff6961;font-weight:bold}
+  </style>
+</head>
+<body>
+  <h1>NateBot 4.0</h1>
+  <div class="controls">
+    <label>Opening:
+      <select id="opening">
+        <option value="bird">Bird's Opening</option>
+        <option value="grob">Grob</option>
+        <option value="monkey">Monkey's Bum</option>
+        <option value="bongcloud">Bongcloud</option>
+      </select>
+    </label>
+    <label>Board Colors:
+      <input type="color" id="lightSquare" value="#f0d9b5">
+      <input type="color" id="darkSquare" value="#b58863">
+    </label>
+    <button id="weed">Weed Them Out</button>
+  </div>
+  <div id="board"></div>
+  <div id="suggestion"></div>
+  <script src="https://cdn.jsdelivr.net/npm/stockfish/stockfish.wasm.js"></script>
+  <script>
+    var game=new Chess();
+    var board;
+    var engine=Stockfish();
+    var openingBook={
+      bird:["f4"],grob:["g4"],monkey:["e4","Nc3","Bc4"],bongcloud:["e4","Ke2"]
+    };
+    var openingMoves=[...openingBook["bird"]];
+    var usingBook=true;
+
+    function pieceTheme(piece){
+      return "pieces/"+piece.toLowerCase()+".jpg";
+    }
+
+    function initBoard(){
+      board=Chessboard('board',{
+        position:'start',
+        pieceTheme:pieceTheme,
+        draggable:true,
+        onDrop:onDrop
+      });
+      updateColors();
+    }
+
+    function onDrop(source,target){
+      var move=game.move({from:source,to:target,promotion:'q'});
+      if(move===null)return 'snapback';
+      setTimeout(botMove,250);
+    }
+
+    function botMove(){
+      if(usingBook&&openingMoves.length>0){
+        var mv=openingMoves.shift();
+        game.move(mv);
+        board.position(game.fen());
+        if(openingMoves.length===0)usingBook=false;
+        return;
+      }
+      engine.postMessage("position fen "+game.fen());
+      engine.postMessage("go depth 12");
+    }
+
+    engine.onmessage=function(e){
+      if(typeof e=="string"&&e.startsWith("bestmove")){
+        var mv=e.split(" ")[1];
+        if(mv==="(none)")return;
+        game.move({from:mv.substring(0,2),to:mv.substring(2,4),promotion:'q'});
+        board.position(game.fen());
+      }
+    };
+
+    function updateColors(){
+      let light=document.getElementById("lightSquare").value;
+      let dark=document.getElementById("darkSquare").value;
+      document.querySelectorAll('.white-1e1d7').forEach(s=>s.style.background=light);
+      document.querySelectorAll('.black-3c85d').forEach(s=>s.style.background=dark);
+    }
+
+    function weedOut(){
+      document.getElementById("suggestion").innerText="Thinking...";
+      engine.onmessage=function(e){
+        if(typeof e=="string"&&e.includes("bestmove"))return;
+        if(typeof e=="string"&&e.startsWith("info depth")){
+          var parts=e.split(" ");
+          var idx=parts.indexOf("pv");
+          if(idx>0){
+            var move=parts[idx+1];
+            document.getElementById("suggestion").innerText="Worst move: "+move;
+          }
+        }
+      };
+      var moves=game.moves();
+      if(moves.length===0){document.getElementById("suggestion").innerText="No moves";return;}
+      engine.postMessage("position fen "+game.fen());
+      engine.postMessage("go depth 8 searchmoves "+moves.join(" "));
+    }
+
+    document.getElementById("lightSquare").addEventListener("input",updateColors);
+    document.getElementById("darkSquare").addEventListener("input",updateColors);
+    document.getElementById("weed").addEventListener("click",weedOut);
+    document.getElementById("opening").addEventListener("change",()=>{
+      var choice=document.getElementById("opening").value;
+      openingMoves=[...openingBook[choice]];
+      usingBook=true;
+    });
+
+    initBoard();
+  </script>
+</body>
+</html>
