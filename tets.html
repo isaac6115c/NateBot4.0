@@ -3,110 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NateBot 4.0</title>
+  <title>NateBot 4.0.1</title>
   <link rel="stylesheet" href="css/chessboard.css">
   <script src="js/jquery-3.4.1.min.js"></script>
   <script src="js/chessboard.js"></script>
   <script src="js/chess-0.10.2.min.js"></script>
   <script src="js/stockfish.js"></script>
   <style>
-    body { 
-      background:#1c1c1c; 
-      color:#fff; 
-      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
-      display:flex; 
-      flex-direction:column; 
-      align-items:center; 
-      padding:12px; 
-      overflow-x:hidden;
-    }
+    body { background:#1c1c1c; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+           display:flex; flex-direction:column; align-items:center; padding:12px; overflow-x:hidden }
     h1 { margin:0 0 10px; font-size:6vw; text-align:center; }
 
-    #menu { 
-      background:#2a2a2a; 
-      padding:16px; 
-      border-radius:10px; 
-      width:100%; 
-      max-width:500px; 
-    }
+    #menu { background:#2a2a2a; padding:16px; border-radius:10px; width:100%; max-width:500px; }
     #menu h2 { margin:0 0 8px; font-size:1rem; }
-    #menu select, #menu button { 
-      width:100%; 
-      padding:12px; 
-      margin:8px 0; 
-      font-size:1rem; 
-      border-radius:8px; 
-      border:1px solid #444; 
-      background:#1f1f1f; 
-      color:#fff; 
-    }
+    #menu select, #menu button { width:100%; padding:12px; margin:8px 0; font-size:1rem; border-radius:8px;
+                                border:1px solid #444; background:#1f1f1f; color:#fff }
 
-    #gameArea { 
-      display:flex; 
-      flex-direction:row; 
-      gap:16px; 
-      margin-top:18px; 
-      width:100%;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
-    #board { 
-      width:90vw; 
-      max-width:480px; 
-      margin:auto; 
-    }
+    #gameArea { display:flex; flex-direction:row; gap:16px; margin-top:18px; width:100%; justify-content:center; flex-wrap:wrap; }
+    #board { width:90vw; max-width:480px; margin:auto; }
 
-    #controls { 
-      display:none; 
-      margin-top:12px; 
-      width:100%; 
-      max-width:500px; 
-    }
-    #controls button { 
-      width:100%; 
-      padding:12px; 
-      font-size:1rem; 
-      border-radius:8px; 
-      border:1px solid #444; 
-      background:#1f1f1f; 
-      color:#fff; 
-    }
+    #controls { display:none; margin-top:12px; width:100%; max-width:500px }
+    #controls button { width:100%; padding:12px; font-size:1rem; border-radius:8px; border:1px solid #444; background:#1f1f1f; color:#fff }
 
-    #moveList { 
-      flex:1; 
-      min-width:200px; 
-      max-width:300px; 
-      max-height:400px; 
-      overflow-y:auto; 
-      background:#2a2a2a; 
-      padding:10px; 
-      border-radius:8px; 
-      font-size:0.9rem; 
-    }
-    #moveList h3 { margin-top:0; font-size:1rem; text-align:center; }
+    #moveList { flex:1; min-width:200px; max-width:300px; max-height:400px; overflow-y:auto; background:#2a2a2a;
+                padding:10px; border-radius:8px; font-size:0.9rem }
+    #moveList h3 { margin-top:0; font-size:1rem; text-align:center }
     table { width:100%; border-collapse:collapse; }
     th, td { text-align:center; padding:4px; border-bottom:1px solid #444; }
 
     .highlight { box-shadow: inset 0 0 0 3px red !important }
-    #status { margin-top:12px; font-size:1.1rem; font-weight:bold; color:#f59e0b; display:none; text-align:center; }
-    #newGameBtn { margin-top:12px; padding:12px; font-size:1rem; border-radius:8px; border:1px solid #444; background:#f59e0b; color:#000; display:none; cursor:pointer; width:100%; max-width:500px; }
+    #status { margin-top:12px; font-size:1.1rem; font-weight:bold; color:#f59e0b; display:none; text-align:center }
+    #newGameBtn { margin-top:12px; padding:12px; font-size:1rem; border-radius:8px; border:1px solid #444; background:#f59e0b; color:#000;
+                  display:none; cursor:pointer; width:100%; max-width:500px }
 
-    .emoji { position:fixed; font-size:2rem; pointer-events:none; animation: fall 3s linear forwards; }
+    .emoji { position:fixed; font-size:2rem; pointer-events:none; animation: fall 3s linear forwards }
     @keyframes fall {
-      from { transform: translateY(-50px) rotate(0deg); opacity:1; }
-      to { transform: translateY(100vh) rotate(720deg); opacity:0; }
+      from { transform: translateY(-50px) rotate(0deg); opacity:1 }
+      to { transform: translateY(100vh) rotate(720deg); opacity:0 }
     }
 
-    /* 📱 Mobile tweaks */
     @media (max-width:600px) {
-      #gameArea { flex-direction:column; align-items:center; }
-      #moveList { width:90%; max-width:95vw; margin-top:12px; }
-      h1 { font-size:7vw; }
+      #gameArea { flex-direction:column; align-items:center }
+      #moveList { width:90%; max-width:95vw; margin-top:12px }
+      h1 { font-size:7vw }
     }
   </style>
 </head>
 <body>
-  <h1>NateBot 4.0</h1>
+  <h1>NateBot 4.0.1</h1>
 
   <div id="menu">
     <h2>Choose Your Side</h2>
@@ -146,6 +90,7 @@
     let aiColor = "black"
     let openingPlayed = false
     let selectedOpening = "bird"
+    let selectedSquare = null
 
     const openings = {
       white: [
@@ -228,42 +173,77 @@
     }
 
     function clearHighlights() {
-      $("#board .square-55d63").removeClass("highlight")
+      document.querySelectorAll("#board .square-55d63").forEach(el => el.classList.remove("highlight"))
     }
 
-    function highlightMove(move) {
+    function highlightSquare(square) {
       clearHighlights()
-      const a = ".square-" + move.from
-      const b = ".square-" + move.to
-      $(a).addClass("highlight")
-      $(b).addClass("highlight")
-      setTimeout(clearHighlights, 1200)
+      const el = document.querySelector(".square-" + square)
+      if (el) el.classList.add("highlight")
     }
 
-    function suggestWorstAndHighlight() {
+    
+    function onBoardClick(e) {
+      const squareEl = e.target.closest(".square-55d63")
+      if (!squareEl) return
+
+      
+      const sqClass = Array.from(squareEl.classList).find(c => /^square-[a-h][1-8]$/.test(c))
+      if (!sqClass) return
+      const square = sqClass.slice(7) // drop "square-"
+
+      handleSquareClick(square)
+    }
+
+    function handleSquareClick(square) {
       if (game.game_over()) return
-      const legal = game.moves({ verbose:true })
-      if (!legal.length) return
-      const mv = legal[legal.length - 1]
-      highlightMove(mv)
-    }
 
-    function onDragStart(source, piece) {
-      if (game.game_over()) return false
-      if ((piece.startsWith("w") && aiColor === "white") || (piece.startsWith("b") && aiColor === "black")) return false
-      if ((playerColor === "white" && piece.startsWith("b")) || (playerColor === "black" && piece.startsWith("w"))) return false
-    }
 
-    function onDrop(source, target) {
-      const move = game.move({ from:source, to:target, promotion:"q" })
-      if (move === null) return "snapback"
+      const turn = game.turn() 
+      if ((playerColor === "white" && turn !== "w") || (playerColor === "black" && turn !== "b")) {
+        return
+      }
+
+      if (!selectedSquare) {
+        const piece = game.get(square)
+        if (!piece) return
+        if ((playerColor === "white" && piece.color !== "w") ||
+            (playerColor === "black" && piece.color !== "b")) return
+        selectedSquare = square
+        highlightSquare(square)
+        return
+      }
+
+      
+      const move = game.move({ from: selectedSquare, to: square, promotion:"q" })
+      clearHighlights()
+      selectedSquare = null
+      if (move === null) return 
+
       board.position(game.fen())
       updateMoveList()
       checkGameOver()
+
+      
       if (!openingPlayed && aiColor === "black") {
         setTimeout(playOpeningOnce, 250)
       } else {
         setTimeout(engineMove, 250)
+      }
+    }
+
+    function buildBoard() {
+      board = ChessBoard("board", {
+        orientation: playerColor,
+        position: "start",
+        draggable: false,
+        pieceTheme: pieceTheme
+      })
+  
+      const boardEl = document.getElementById("board")
+      if (!boardEl._clickBound) {
+        boardEl.addEventListener("click", onBoardClick)
+        boardEl._clickBound = true
       }
     }
 
@@ -319,6 +299,7 @@
       document.getElementById("newGameBtn").style.display = "none"
       const tbody = document.querySelector("#movesTable tbody")
       tbody.innerHTML = ""
+      selectedSquare = null
     }
 
     document.getElementById("newGameBtn").addEventListener("click", resetGame)
@@ -343,21 +324,22 @@
       document.getElementById("status").style.display = "none"
       document.getElementById("newGameBtn").style.display = "none"
       openingPlayed = false
+      selectedSquare = null
       game = new Chess()
-      board = ChessBoard("board", {
-        orientation: playerColor,
-        position: "start",
-        draggable: true,
-        pieceTheme: pieceTheme,
-        onDragStart: onDragStart,
-        onDrop: onDrop
-      })
+      buildBoard()
       updateMoveList()
       initStockfish()
       if (aiColor === "white") setTimeout(playOpeningOnce, 400)
     })
 
-    document.getElementById("weedBtn").addEventListener("click", suggestWorstAndHighlight)
+    document.getElementById("weedBtn").addEventListener("click", function() {
+      if (game.game_over()) return
+      const legal = game.moves({ verbose:true })
+      if (!legal.length) return
+      const mv = legal[legal.length - 1]
+      highlightSquare(mv.from)
+      setTimeout(() => highlightSquare(mv.to), 500)
+    })
 
     populateOpenings()
   </script>
