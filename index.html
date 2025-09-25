@@ -39,7 +39,7 @@
   </style>
 </head>
 <body>
-  <h1>NateBot 4.3</h1>
+  <h1>NateBot 4.3.1</h1>
 
   <div id="menu">
     <h2>Choose Your Side</h2>
@@ -385,6 +385,56 @@
 
     window.addEventListener("load", loadPatchNotes)
     populateOpenings()
+ 
+  function exportPGN() {
+  const pgn = game.pgn({
+    max_width: 80,
+    newline_char: "\n"
+  });
+
+  const blob = new Blob([pgn], { type: "application/x-chess-pgn" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "natebot_game.pgn";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showGameOverOptions(resultText) {
+  showStatus(resultText);
+  document.getElementById("newGameBtn").style.display = "block";
+
+  let exportBtn = document.getElementById("exportBtn");
+  if (!exportBtn) {
+    exportBtn = document.createElement("button");
+    exportBtn.id = "exportBtn";
+    exportBtn.textContent = "Download PGN";
+    exportBtn.style.marginTop = "8px";
+    exportBtn.style.padding = "12px";
+    exportBtn.style.fontSize = "1rem";
+    exportBtn.style.borderRadius = "8px";
+    exportBtn.style.border = "1px solid #444";
+    exportBtn.style.background = "#0ea5e9";
+    exportBtn.style.color = "#000";
+    exportBtn.style.cursor = "pointer";
+    document.getElementById("status").appendChild(exportBtn);
+    exportBtn.addEventListener("click", exportPGN);
+  }
+}
+
+function checkGameOver() {
+  if (game.in_checkmate()) {
+    if (game.turn() === "w") {
+      showGameOverOptions("NateBot Wins by Checkmate!");
+    } else {
+      showGameOverOptions("You Win by Checkmate!");
+    }
+  } else if (game.in_draw()) {
+    showGameOverOptions("Draw!");
+  }
+}
   </script>
+  
 </body>
 </html>
