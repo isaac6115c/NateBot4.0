@@ -30,8 +30,6 @@
     .highlight { box-shadow: inset 0 0 0 3px red !important }
     #status { margin-top:12px; font-size:1.1rem; font-weight:bold; color:#f59e0b; display:none; text-align:center }
     #newGameBtn { margin-top:12px; padding:12px; font-size:1rem; border-radius:8px; border:1px solid #444; background:#f59e0b; color:#000; display:none; cursor:pointer; width:100%; max-width:500px }
-    .emoji { position:fixed; font-size:2rem; pointer-events:none; animation: fall 3s linear forwards }
-    @keyframes fall { from { transform: translateY(-50px) rotate(0deg); opacity:1 } to { transform: translateY(100vh) rotate(720deg); opacity:0 } }
     @media (max-width:600px) { #gameArea { flex-direction:column; align-items:center } #moveList { width:90%; max-width:95vw; margin-top:12px } #controls { order:-1; margin-bottom:12px } h1 { font-size:7vw } }
   </style>
 </head>
@@ -79,6 +77,8 @@
     <button id="resignBtn">Resign</button>
     <button id="weedBtn">Weed Them Out</button>
   </div>
+
+  <audio id="weedSound" src="sounds/weed.m4a" preload="auto"></audio>
 
   <script>
     let board, game, stockfish
@@ -336,6 +336,8 @@
       if (game.game_over()) return
       const legal = game.moves({ verbose:true })
       if (!legal.length) return
+      const audio = document.getElementById("weedSound")
+      if (audio) { audio.currentTime = 0; audio.play() }
       const mv = legal[legal.length - 1]
       highlightSquare(mv.from)
       setTimeout(() => highlightSquare(mv.to), 500)
