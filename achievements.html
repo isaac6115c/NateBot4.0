@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NateBot 5.0 | Achievements</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/settings.js" defer></script>
+  <script src="js/achievements.js" defer></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="game.html">Play</a></li>
+      <li><a href="openings.html">Openings</a></li>
+      <li><a href="mainevent.html">Main Event</a></li>
+      <li><a href="achievements.html" class="active">Achievements</a></li>
+    </ul>
+  </nav>
+
+<header class="achievements-header">
+  <h1>NateBot Achievements</h1>
+  <p>Earn these by beating NateBot using the matching opening!</p>
+  <p id="progress" class="progress-counter"></p>
+  <div class="progress-bar">
+    <div id="progress-fill" class="progress-fill"></div>
+  </div>
+</header>
+
+  <main id="achievements-list" class="achievements-container"></main>
+
+  <script>
+    async function loadAchievements() {
+      const achievements = JSON.parse(localStorage.getItem("achievements")) || {};
+      const container = document.getElementById("achievements-list");
+
+      // helper to fetch JSON safely
+      async function fetchJSON(path) {
+        const res = await fetch(path, { cache: "no-store" });
+        if (!res.ok) throw new Error("Missing " + path);
+        return res.json();
+      }
+
+      // load both white + black openings
+      const white = await fetchJSON("data/whiteOpenings.json");
+      const black = await fetchJSON("data/blackOpenings.json");
+
+      // flatten into one array
+      const allOpenings = [
+        ...Object.values(white),
+        ...Object.values(black)
+      ];
+
+      let unlockedCount = 0;
+      allOpenings.forEach(op => {
+        const unlocked = achievements[op.name];
+        if (unlocked) unlockedCount++;
+
+        const div = document.createElement("div");
+        div.className = "achievement-card " + (unlocked ? "unlocked" : "locked");
+        div.innerHTML = `
+          <h3>${op.name}</h3>
+          <p class="status">${unlocked ? "🏆 Unlocked" : "🔒 Locked"}</p>
+          <small>Available: Beat NateBot with this opening</small>
+        `;
+        container.appendChild(div);
+      });
+
+      // update progress counter
+      document.getElementById("progress").textContent =
+        `Progress: ${unlockedCount} / ${allOpenings.length} unlocked`;
+    }
+
+    document.addEventListener("DOMContentLoaded", loadAchievements);
+  </script>
+
+  <style>
+    .achievements-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto; /* centers grid */
+    }
+    .achievement-card {
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      background: #222;
+      color: #fff;
+      border: 2px solid #555;
+      transition: transform 0.2s;
+    }
+    .achievement-card h3 {
+      margin: 0 0 8px;
+    }
+    .achievement-card small {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.85em;
+      color: #bbb;
+    }
+    .achievement-card.unlocked {
+      border-color: #4caf50;
+      background: #2d3e2f;
+    }
+    .achievement-card.locked {
+      border-color: #888;
+      opacity: 0.6;
+    }
+    .achievement-card:hover {
+      transform: scale(1.05);
+    }
+    .progress-counter {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-top: 8px;
+    }
+  </style>
+
+  <footer class="site-footer">
+    <p>NateBot 5.0 &mdash; <a href="patchnotes.html">Patch Notes</a></p>
+  </footer>
+
+</body>
+</html>
+

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NateBot</title>
+  <meta name="description" content="Play NateBot, the chess Bot that proves Nathan cheated at the Main Event by adding 2 minutes to his clock when he should not have.">
+  <link rel="stylesheet" href="css/chessboard.css">
+  <script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/chessboard.js"></script>
+  <script src="js/chess-0.10.2.min.js"></script>
+  <script src="js/stockfish.js"></script>
+  <style>
+    body { background:#1c1c1c; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; display:flex; flex-direction:column; align-items:center; padding:12px; overflow-x:hidden }
+    h1 { margin:0 0 10px; font-size:6vw; text-align:center }
+    #menu { background:#2a2a2a; padding:16px; border-radius:10px; width:100%; max-width:500px }
+    #menu h2 { margin:0 0 8px; font-size:1rem }
+    #menu select, #menu button { width:100%; padding:12px; margin:8px 0; font-size:1rem; border-radius:8px; border:1px solid #444; background:#1f1f1f; color:#fff }
+    #difficultySelect { margin:10px 0; text-align:left }
+    #difficultySelect label { display:block; margin:4px 0 }
+    #gameArea { display:flex; flex-direction:row; gap:16px; margin-top:18px; width:100%; justify-content:center; flex-wrap:wrap }
+    #board { width:90vw; max-width:480px; margin:auto }
+    .captured { display:flex; justify-content:center; gap:4px; flex-wrap:wrap; margin:6px 0; min-height:24px }
+    .captured img { width:20px; height:20px }
+    #controls { display:none; margin-top:12px; width:100%; max-width:500px; display:flex; gap:8px }
+    #controls button { flex:1; padding:12px; font-size:1rem; border-radius:8px; border:1px solid #444; background:#1f1f1f; color:#fff }
+    #moveList { flex:1; min-width:200px; max-width:300px; max-height:400px; overflow-y:auto; background:#2a2a2a; padding:10px; border-radius:8px; font-size:0.9rem }
+    #moveList h3 { margin-top:0; font-size:1rem; text-align:center }
+    table { width:100%; border-collapse:collapse }
+    th, td { text-align:center; padding:4px; border-bottom:1px solid #444 }
+    .highlight { box-shadow: inset 0 0 0 3px red !important }
+    #status { margin-top:12px; font-size:1.1rem; font-weight:bold; color:#f59e0b; display:none; text-align:center }
+    #newGameBtn { margin-top:12px; padding:12px; font-size:1rem; border-radius:8px; border:1px solid #444; background:#f59e0b; color:#000; display:none; cursor:pointer; width:100%; max-width:500px }
+    #difficultyLabel { margin-top:8px; font-size:1rem; font-weight:bold; color:#0ea5e9; text-align:center }
+    #patchNotes { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#2a2a2a; padding:20px; border-radius:12px; max-width:400px; box-shadow:0 0 20px rgba(0,0,0,0.7); z-index:9999; display:none }
+    #patchNotes h2 { margin-top:0; color:#f59e0b }
+    #patchNotes button { margin-top:12px; padding:10px; width:100%; border:none; border-radius:8px; background:#f59e0b; color:#000; cursor:pointer }
+    @media (max-width:600px) { #gameArea { flex-direction:column; align-items:center } #moveList { width:90%; max-width:95vw; margin-top:12px } #controls { order:-1; margin-bottom:12px } h1 { font-size:7vw } }
+  </style>
+</head>
+<body>
+  <h1>NateBot 4.3.1</h1>
+
+  <div id="menu">
+    <h2>Choose Your Side</h2>
+    <select id="colorSelect">
+      <option value="white">Play as White</option>
+      <option value="black">Play as Black</option>
+    </select>
+
+    <h2>Choose NateBot’s Opening</h2>
+    <select id="openingSelect"></select>
+
+    <h2>Choose Difficulty</h2>
+    <div id="difficultySelect">
+      <label><input type="radio" name="difficulty" value="kyle" checked> Kyle</label>
+      <label><input type="radio" name="difficulty" value="nate"> NateBot</label>
+      <label><input type="radio" name="difficulty" value="uncle"> Uncle Mike</label>
+    </div>
+
+    <button id="startBtn">Start Game</button>
+  </div>
+
+  <div id="gameArea" style="display:none;">
+    <div>
+      <div class="captured" id="capturedWhite"></div>
+      <div id="board"></div>
+      <div class="captured" id="capturedBlack"></div>
+      <div id="status"></div>
+      <div id="difficultyLabel"></div>
+      <button id="newGameBtn">Start New Game</button>
+    </div>
+    <div id="moveList">
+      <h3>Moves</h3>
+      <table id="movesTable">
+        <thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button id="resignBtn">Resign</button>
+    <button id="weedBtn">Weed Them Out</button>
+  </div>
+
+  <audio id="weedSound" src="sounds/weed.m4a" preload="auto"></audio>
+
+  <div id="patchNotes">
+    <h2>Patch Notes</h2>
+    <ul id="patchNotesList"></ul>
+    <button id="closePatchNotes">Got it!</button>
+  </div>
+
+  <script>
+    let board, game, stockfish
+    let playerColor = "white"
+    let aiColor = "black"
+    let openingPlayed = false
+    let selectedOpening = "bird"
+    let selectedSquare = null
+    let difficulty = "kyle"
+    let capturedWhite = []
+    let capturedBlack = []
+
+    function pieceTheme(piece) {
+      if (piece === "wK" && aiColor === "white") return "pieces/wKn.png"
+      if (piece === "bK" && aiColor === "black") return "pieces/bKn.png"
+      return "pieces/" + piece + ".png"
+    }
+
+    const openings = {
+      white: [
+        { value:"bird", text:"Bird’s Opening (f4)" },
+        { value:"bongcloud", text:"Bongcloud (e4)" },
+        { value:"monkey", text:"Monkey’s Bum (e4)" }
+      ],
+      black: [
+        { value:"grob", text:"Grob Attack (g5)" },
+        { value:"bongcloud", text:"Bongcloud (e5)" },
+        { value:"monkey", text:"Monkey’s Bum (e5)" }
+      ]
+    }
+
+    function populateOpenings() {
+      const sel = document.getElementById("openingSelect")
+      sel.innerHTML = ""
+      openings[aiColor].forEach(o => {
+        const opt = document.createElement("option")
+        opt.value = o.value
+        opt.textContent = o.text
+        sel.appendChild(opt)
+      })
+      selectedOpening = sel.value
+    }
+
+    function initStockfish() {
+      stockfish = new Worker("js/stockfish.js")
+      stockfish.postMessage("uci")
+      stockfish.postMessage("isready")
+      stockfish.onmessage = function(e) {
+        const line = e.data || ""
+        if (line.startsWith("bestmove")) {
+          const parts = line.split(" ")
+          const mv = parts[1]
+          if (mv && mv !== "(none)") {
+            applyMove({ from: mv.slice(0,2), to: mv.slice(2,4), promotion:"q" })
+          }
+        }
+      }
+    }
+
+    function engineMove() {
+      if (game.game_over()) return
+      if ((aiColor === "white" && game.turn() !== "w") || (aiColor === "black" && game.turn() !== "b")) return
+      if (difficulty === "kyle") {
+        const moves = game.moves({ verbose:true })
+        if (!moves.length) return
+        const mv = moves[moves.length - 1]
+        applyMove({ from: mv.from, to: mv.to, promotion:"q" })
+        return
+      }
+      if (difficulty === "nate") {
+        stockfish.postMessage("position fen " + game.fen())
+        stockfish.postMessage("go depth 5")
+        return
+      }
+      if (difficulty === "uncle") {
+        stockfish.postMessage("position fen " + game.fen())
+        stockfish.postMessage("go depth 20")
+        return
+      }
+    }
+
+    function playOpeningOnce() {
+      if (openingPlayed) return
+      const map = {
+        bird:   { white:"f2f4" },
+        grob:   { black:"g7g5" },
+        bongcloud: { white:"e2e3", black:"e7e6" },
+        monkey:    { white:"e2e4", black:"e7e5" }
+      }
+      const m = (map[selectedOpening] || {})[aiColor]
+      if (m) applyMove({ from:m.slice(0,2), to:m.slice(2,4), promotion:"q" })
+      openingPlayed = true
+      setTimeout(engineMove, 250)
+    }
+
+    function applyMove(moveObj) {
+      const move = game.move(moveObj)
+      if (!move) return
+      if (move.captured) {
+        const capturedColor = move.color === "w" ? "b" : "w"
+        const img = `<img src="pieces/${capturedColor}${move.captured.toUpperCase()}.png">`
+        if (capturedColor === "w") {
+          capturedWhite.push(img)
+          document.getElementById("capturedWhite").innerHTML = capturedWhite.join("")
+        } else {
+          capturedBlack.push(img)
+          document.getElementById("capturedBlack").innerHTML = capturedBlack.join("")
+        }
+      }
+      board.position(game.fen())
+      updateMoveList()
+      checkGameOver()
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll("#board .square-55d63").forEach(el => el.classList.remove("highlight"))
+    }
+
+    function highlightSquare(square) {
+      clearHighlights()
+      const el = document.querySelector(".square-" + square)
+      if (el) el.classList.add("highlight")
+    }
+
+    function onBoardClick(e) {
+      const squareEl = e.target.closest(".square-55d63")
+      if (!squareEl) return
+      const sqClass = Array.from(squareEl.classList).find(c => /^square-[a-h][1-8]$/.test(c))
+      if (!sqClass) return
+      const square = sqClass.slice(7)
+      handleSquareClick(square)
+    }
+
+    function handleSquareClick(square) {
+      if (game.game_over()) return
+      const turn = game.turn()
+      if ((playerColor === "white" && turn !== "w") || (playerColor === "black" && turn !== "b")) return
+      if (!selectedSquare) {
+        const piece = game.get(square)
+        if (!piece) return
+        if ((playerColor === "white" && piece.color !== "w") || (playerColor === "black" && piece.color !== "b")) return
+        selectedSquare = square
+        highlightSquare(square)
+        return
+      }
+      const move = { from:selectedSquare, to:square, promotion:"q" }
+      selectedSquare = null
+      clearHighlights()
+      if (game.move(move)) {
+        game.undo()
+        applyMove(move)
+        if (!openingPlayed && aiColor === "black") setTimeout(playOpeningOnce, 250)
+        else setTimeout(engineMove, 250)
+      }
+    }
+
+    function buildBoard() {
+      board = ChessBoard("board", {
+        orientation: playerColor,
+        position: "start",
+        draggable: false,
+        pieceTheme: pieceTheme
+      })
+      const boardEl = document.getElementById("board")
+      if (!boardEl._clickBound) {
+        boardEl.addEventListener("click", onBoardClick)
+        boardEl._clickBound = true
+      }
+    }
+
+    function updateMoveList() {
+      const history = game.history()
+      const tbody = document.querySelector("#movesTable tbody")
+      tbody.innerHTML = ""
+      for (let i = 0; i < history.length; i += 2) {
+        const moveNum = (i/2)+1
+        const white = history[i] || ""
+        const black = history[i+1] || ""
+        const row = `<tr><td>${moveNum}</td><td>${white}</td><td>${black}</td></tr>`
+        tbody.innerHTML += row
+      }
+    }
+
+    function checkGameOver() {
+      if (game.in_checkmate()) {
+        if (game.turn() === "w") showStatus("NateBot Wins by Checkmate!")
+        else showStatus("You Win by Checkmate!")
+        document.getElementById("newGameBtn").style.display = "block"
+      }
+    }
+
+    function showStatus(msg) {
+      const statusDiv = document.getElementById("status")
+      statusDiv.textContent = msg
+      statusDiv.style.display = "block"
+    }
+
+    function resetGame() {
+      if (stockfish) { try { stockfish.terminate() } catch(e) {} stockfish = null }
+      document.getElementById("menu").style.display = "block"
+      document.getElementById("gameArea").style.display = "none"
+      document.getElementById("controls").style.display = "none"
+      document.getElementById("status").style.display = "none"
+      document.getElementById("newGameBtn").style.display = "none"
+      document.querySelector("#movesTable tbody").innerHTML = ""
+      document.getElementById("capturedWhite").innerHTML = ""
+      document.getElementById("capturedBlack").innerHTML = ""
+      capturedWhite = []
+      capturedBlack = []
+      selectedSquare = null
+    }
+
+    document.getElementById("newGameBtn").addEventListener("click", resetGame)
+    document.getElementById("resignBtn").addEventListener("click", resetGame)
+
+    document.getElementById("colorSelect").addEventListener("change", function() {
+      playerColor = this.value
+      aiColor = playerColor === "white" ? "black" : "white"
+      populateOpenings()
+    })
+
+    document.getElementById("openingSelect").addEventListener("change", function() {
+      selectedOpening = this.value
+    })
+
+    document.querySelectorAll("input[name=difficulty]").forEach(r => {
+      r.addEventListener("change", function() {
+        difficulty = this.value
+      })
+    })
+
+    document.getElementById("startBtn").addEventListener("click", function() {
+      playerColor = document.getElementById("colorSelect").value
+      aiColor = playerColor === "white" ? "black" : "white"
+      selectedOpening = document.getElementById("openingSelect").value
+
+      document.getElementById("menu").style.display = "none"
+      document.getElementById("gameArea").style.display = "flex"
+      document.getElementById("controls").style.display = "flex"
+      document.getElementById("status").style.display = "none"
+      document.getElementById("newGameBtn").style.display = "none"
+
+      document.getElementById("difficultyLabel").textContent = "Difficulty: " + (difficulty === "kyle" ? "Kyle" : difficulty === "nate" ? "NateBot" : "Uncle Mike")
+
+      openingPlayed = false
+      selectedSquare = null
+      game = new Chess()
+      capturedWhite = []
+      capturedBlack = []
+      buildBoard()
+      updateMoveList()
+      initStockfish()
+      if (aiColor === "white") setTimeout(playOpeningOnce, 400)
+    })
+
+    document.getElementById("weedBtn").addEventListener("click", function() {
+      if (game.game_over()) return
+      const legal = game.moves({ verbose:true })
+      if (!legal.length) return
+      const audio = document.getElementById("weedSound")
+      if (audio) { audio.currentTime = 0; audio.play() }
+      const mv = legal[legal.length - 1]
+      highlightSquare(mv.from)
+      setTimeout(() => highlightSquare(mv.to), 500)
+    })
+
+    async function loadPatchNotes() {
+      try {
+        const res = await fetch("patchnotes.json?_=" + Date.now())
+        const data = await res.json()
+        const currentVersion = data.version
+        const seen = localStorage.getItem("natebot_seen_version")
+        if (seen !== currentVersion) {
+          const listEl = document.getElementById("patchNotesList")
+          listEl.innerHTML = ""
+          data.notes.forEach(n => {
+            const li = document.createElement("li")
+            li.textContent = n
+            listEl.appendChild(li)
+          })
+          document.querySelector("#patchNotes h2").textContent = "Patch Notes - v" + currentVersion
+          document.getElementById("patchNotes").style.display = "block"
+          document.getElementById("closePatchNotes").onclick = () => {
+            document.getElementById("patchNotes").style.display = "none"
+            localStorage.setItem("natebot_seen_version", currentVersion)
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load patch notes:", err)
+      }
+    }
+
+    window.addEventListener("load", loadPatchNotes)
+    populateOpenings()
+ 
+  function exportPGN() {
+  const pgn = game.pgn({
+    max_width: 80,
+    newline_char: "\n"
+  });
+
+  const blob = new Blob([pgn], { type: "application/x-chess-pgn" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "natebot_game.pgn";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showGameOverOptions(resultText) {
+  showStatus(resultText);
+  document.getElementById("newGameBtn").style.display = "block";
+
+  let exportBtn = document.getElementById("exportBtn");
+  if (!exportBtn) {
+    exportBtn = document.createElement("button");
+    exportBtn.id = "exportBtn";
+    exportBtn.textContent = "Download PGN";
+    exportBtn.style.marginTop = "8px";
+    exportBtn.style.padding = "12px";
+    exportBtn.style.fontSize = "1rem";
+    exportBtn.style.borderRadius = "8px";
+    exportBtn.style.border = "1px solid #444";
+    exportBtn.style.background = "#0ea5e9";
+    exportBtn.style.color = "#000";
+    exportBtn.style.cursor = "pointer";
+    document.getElementById("status").appendChild(exportBtn);
+    exportBtn.addEventListener("click", exportPGN);
+  }
+}
+
+function checkGameOver() {
+  if (game.in_checkmate()) {
+    if (game.turn() === "w") {
+      showGameOverOptions("NateBot Wins by Checkmate!");
+    } else {
+      showGameOverOptions("You Win by Checkmate!");
+    }
+  } else if (game.in_draw()) {
+    showGameOverOptions("Draw!");
+  }
+}
+  </script>
+  
+</body>
+</html>

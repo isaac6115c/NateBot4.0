@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NateBot 5.0 | Play</title>
+
+  <link rel="stylesheet" href="css/chessboard.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/nav.js"></script>
+  <script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/chess-0.10.2.min.js"></script>
+  <script src="js/chessboard.js"></script>
+  <script src="js/stockfish.js"></script>
+  <script src="js/settings.js" defer></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/natebot.js" defer></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="game.html" class="active">Play</a></li>
+      <li><a href="openings.html">Openings</a></li>
+      <li><a href="mainevent.html">Main Event</a></li>
+      <li><a href="achievements.html">Achievements</a></li>
+      <li><a href="nateybird.html">NateyBird</a></li>
+    </ul>
+  </nav>
+
+  <header class="site-header">
+    <h1>Play NateBot 5.0</h1>
+    <p>The Main Event every day</p>
+  </header>
+
+
+  <main class="setup-screen" id="menu">
+    <div class="play-container">
+      <h2>Choose Your Side</h2>
+      <select id="colorSelect">
+        <option value="white">Play as White</option>
+        <option value="black">Play as Black</option>
+      </select>
+
+      <h2>Choose Difficulty</h2>
+      <div class="radio-group">
+        <div class="radio-pill">
+          <input type="radio" id="diff-kyle" name="difficulty" value="kyle" checked>
+          <label for="diff-kyle">Kyle</label>
+        </div>
+        <div class="radio-pill">
+          <input type="radio" id="diff-nate" name="difficulty" value="nate">
+          <label for="diff-nate">NateBot</label>
+        </div>
+        <div class="radio-pill">
+          <input type="radio" id="diff-uncle" name="difficulty" value="uncle">
+          <label for="diff-uncle">Uncle Mike</label>
+        </div>
+      </div>
+
+      <h2>Choose NateBot’s Opening</h2>
+      <select id="openingSelect"></select>
+
+      <button id="startBtn">Start Game</button>
+    </div>
+  </main>
+
+
+  <div id="gameArea" class="play-container" style="display:none;">
+    <div id="capturedAI" class="captured"></div>
+    <div id="board"></div>
+    <div id="capturedPlayer" class="captured"></div>
+
+    <div id="status"></div>
+    <div class="controls">
+      <button id="weedBtn">Weed Them Out</button>
+      <button id="resignBtn">Resign</button>
+      <button id="exportBtn">Export PGN</button>
+    </div>
+
+    <div id="movelist" class="movelist"></div>
+  </div>
+
+  <audio id="weedSound" src="sounds/weed.m4a" preload="auto"></audio>
+  
+  </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "grob": {
+    "name": "Grob Attack",
+    "moves": ["g4", "d5", "Bg2", "Bf5"],
+    "description": "I'M GROBBED UP"
+  },
+  "bongcloud": {
+    "name": "Bongcloud",
+    "moves": ["e4", "e5", "Ke2", "Ke7"],
+    "description": "SNOOP DOGG"
+  },
+    "monkeysbum": {
+    "name": "monkeys bum",
+    "moves": ["e4", "c5", "f3", "d5", "exd5", "Qxd5", "Nc3"],
+    "description": "want a banna?"
+  },
+    "siciliandragon": {
+    "name": "Sicilian Dragon",
+    "moves": ["e4", "c5", "Nf3", "d6", "d4", "cxd4", "Nxd4","Nf6","Nc3","g6"],
+    "description": "Play this and you may get accused of cheating"
+
+},
+    "scholarsmate": {
+    "name": "Scholar's mate",
+    "moves": ["e4", "e5","Qh5","Nc6","Bc4","Nf6"],
+    "description": "Whomp Whomp"
+  }
+}
+
