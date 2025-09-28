@@ -1,8 +1,6 @@
-// mainevent.js 
-
+// mainevent.js
 
 const PGN_FILES = ["game1.pgn", "game2.pgn", "game3.pgn"];
-
 
 const replayState = {
   game: null,
@@ -20,12 +18,12 @@ async function initMainEvent() {
     renderStandings(players);
     renderGames(games);
 
-  
+    // Replay controls
     document.getElementById("prevMove").addEventListener("click", prevReplayMove);
     document.getElementById("nextMove").addEventListener("click", nextReplayMove);
     document.getElementById("closeReplay").addEventListener("click", closeReplay);
 
-   
+    // Modal close when clicking outside
     document.getElementById("replayModal").addEventListener("click", (e) => {
       if (e.target.id === "replayModal") closeReplay();
     });
@@ -35,6 +33,9 @@ async function initMainEvent() {
   }
 }
 
+// ----------------------
+// Load PGNs
+// ----------------------
 async function loadPGNs(files) {
   const results = [];
   for (const file of files) {
@@ -61,6 +62,9 @@ function parseHeaders(pgnText) {
   };
 }
 
+// ----------------------
+// Build Standings
+// ----------------------
 function buildStandings(games) {
   const players = {};
   for (const g of games) {
@@ -81,6 +85,9 @@ function buildStandings(games) {
   return players;
 }
 
+// ----------------------
+// Render Standings (Table Only)
+// ----------------------
 function renderStandings(players) {
   const table = document.getElementById("standingsTable");
   table.innerHTML = `
@@ -89,15 +96,24 @@ function renderStandings(players) {
   Object.keys(players).forEach(name => {
     const { wins, losses, draws, points } = players[name];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${name}</td><td>${wins}</td><td>${losses}</td><td>${draws}</td><td>${points}</td>`;
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td>${wins}</td>
+      <td>${losses}</td>
+      <td>${draws}</td>
+      <td>${points}</td>
+    `;
     table.appendChild(tr);
   });
 }
 
+// ----------------------
+// Render Games
+// ----------------------
 function renderGames(games) {
   const list = document.getElementById("gameList");
   list.innerHTML = "";
-  games.forEach((g, i) => {
+  games.forEach((g) => {
     const li = document.createElement("li");
     li.textContent = `Round ${g.round}: ${g.white} vs ${g.black} — ${g.result} (${g.date})`;
     li.addEventListener("click", () => openReplay(g));
@@ -105,9 +121,10 @@ function renderGames(games) {
   });
 }
 
-
+// ----------------------
+// Replay Controls
+// ----------------------
 function openReplay(gameMeta) {
- 
   const modal = document.getElementById("replayModal");
   modal.style.display = "flex";
   document.getElementById("replayTitle").textContent =
@@ -115,14 +132,13 @@ function openReplay(gameMeta) {
 
   replayState.game = new Chess();
   replayState.game.load_pgn(gameMeta.pgn);
-  replayState.moves = replayState.game.history(); 
+  replayState.moves = replayState.game.history();
+  replayState.idx = 0;
   replayState.game.reset();
 
- 
   const target = document.getElementById("replayBoard");
   target.innerHTML = "";
 
-  
   replayState.board = Chessboard("replayBoard", {
     position: "start",
     pieceTheme: pieceThemeForMainEvent,
@@ -160,7 +176,9 @@ function closeReplay() {
   replayState.idx = 0;
 }
 
-
+// ----------------------
+// Piece Theme Loader
+// ----------------------
 function currentPieceSet() {
   const direct = localStorage.getItem("pieceSet");
   if (direct) return direct;

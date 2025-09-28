@@ -6,12 +6,13 @@
   <title>NateBot 5.0 | Achievements</title>
 
   <link rel="stylesheet" href="css/style.css" />
+  <script src="js/nav.js"></script>
   <script src="js/settings.js" defer></script>
   <script src="js/achievements.js" defer></script>
 </head>
 <body>
 
-  <!-- Navbar -->
+  
   <nav class="navbar">
     <ul>
       <li><a href="index.html">Home</a></li>
@@ -38,18 +39,18 @@
       const achievements = JSON.parse(localStorage.getItem("achievements")) || {};
       const container = document.getElementById("achievements-list");
 
-      // helper to fetch JSON safely
+    
       async function fetchJSON(path) {
         const res = await fetch(path, { cache: "no-store" });
         if (!res.ok) throw new Error("Missing " + path);
         return res.json();
       }
 
-      // load both white + black openings
+   
       const white = await fetchJSON("data/whiteOpenings.json");
       const black = await fetchJSON("data/blackOpenings.json");
 
-      // flatten into one array
+    
       const allOpenings = [
         ...Object.values(white),
         ...Object.values(black)
