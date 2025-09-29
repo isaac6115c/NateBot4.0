@@ -748,5 +748,8 @@ body.mainevent main section {
   cursor: pointer;
   user-select: none;
 }
+#game-area, #head, #hatch, #restartBtn {
+  touch-action: manipulation;
+}
 
 
