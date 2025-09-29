@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PeekyHatch | NateBot 5.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/nav.js"></script>
+  <style>
+    body {
+      background: var(--ui-bg);
+      color: var(--ui-text);
+      margin: 0;
+    }
+
+    .peekyhatch-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2rem 1rem;
+      min-height: calc(100vh - 150px); 
+    }
+
+    .peekyhatch-container h1 {
+      margin: 0.5rem 0;
+    }
+
+    .peekyhatch-container h2 {
+      margin: 0.25rem 0 1rem;
+      font-size: 1.1rem;
+      font-weight: normal;
+    }
+
+    #score {
+      margin: 1rem 0;
+      font-size: 1.5rem;
+    }
+
+    #game-area {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      overflow: hidden;
+      margin: 1rem auto;
+    }
+
+    #background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      object-fit: cover;
+    }
+
+    #head {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      display: none;
+      cursor: pointer;
+      z-index: 2;
+      transition: all 0.3s ease-out;
+      pointer-events: auto;
+    }
+
+    #hatch {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      user-select: none;
+      z-index: 3; /* top layer */
+    }
+
+    #restartBtn {
+      margin-top: 1rem;
+      padding: 10px 20px;
+      background: var(--ui-accent);
+      color: var(--ui-text);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+
+    @media (max-width: 560px) {
+      #game-area { width: 300px; height: 300px; }
+      #head { width: 80px; height: 80px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="game.html">Play</a></li>
+      <li><a href="openings.html">Openings</a></li>
+      <li><a href="mainevent.html">Main Event</a></li>
+      <li><a href="achievements.html">Achievements</a></li>
+      <li><a href="nateybird.html">NateyBird</a></li>
+      <li><a href="peekyhatch.html" class="active">PeekyHatch</a></li>
+    </ul>
+  </nav>
+
+  <main class="peekyhatch-container">
+    <h1>PeekyHatch</h1>
+    <h2>Tap/click the hatch to open</h2>
+    <div id="score">Score: 0</div>
+
+    <div id="game-area">
+      <img id="background" src="images/background.png" alt="Background">
+      <img id="head" src="images/head.png" alt="Head">
+      <img id="hatch" src="images/hatch_closed.png" alt="Hatch">
+    </div>
+
+    <button id="restartBtn">Restart</button>
+  </main>
+
+  <footer class="site-footer">
+    <p>NateBot 5.0 &mdash; <a href="patchnotes.html">Patch Notes</a></p>
+  </footer>
+
+  <script src="js/peekyhatch.js"></script>
+</body>
+</html>

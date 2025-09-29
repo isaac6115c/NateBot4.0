@@ -1,4 +1,4 @@
-/* --- VARIABLES --- */
+
 :root {
   --board-light: #f0d9b5;
   --board-dark: #b58863;
@@ -9,7 +9,7 @@
   --radius: 8px;
 }
 
-/* --- BASE STYLES --- */
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
@@ -23,11 +23,13 @@ body {
   padding: 20px;
 }
 
-/* --- NAVBAR --- */
+
 .navbar {
   background: #111;
   border-bottom: 2px solid var(--ui-accent);
   padding: 10px 0;
+  position: relative;
+  z-index: 9999;
 }
 .navbar ul {
   list-style: none;
@@ -45,6 +47,8 @@ body {
   padding: 6px 10px;
   border-radius: var(--radius);
   transition: background 0.2s;
+  position: relative;
+  z-index: 9999;
 }
 .navbar a:hover,
 .navbar a.active {
@@ -52,14 +56,14 @@ body {
   color: #fff;
 }
 
-/* --- MENU (always centered) --- */
+
 #menu {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  min-height: calc(100vh - 120px); /* full screen minus header/nav height */
+  min-height: calc(100vh - 120px); 
   margin: 0 auto;
   text-align: center;
 }
@@ -69,7 +73,7 @@ body {
   margin-bottom: 6px;
 }
 
-/* --- Sleek Dropdowns --- */
+
 #menu select {
   background: #222;
   border: 2px solid var(--ui-accent);
@@ -86,7 +90,7 @@ body {
   border-color: #ff4757;
 }
 
-/* --- Buttons (global theme) --- */
+
 button,
 #menu button,
 .controls button,
@@ -112,7 +116,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* --- Modern Radio Buttons (pill style) --- */
+
 .radio-group {
   display: flex;
   gap: 10px;
@@ -139,24 +143,46 @@ button:disabled {
 }
 .radio-pill label:hover { background: #333; }
 
-/* --- HOME PAGE --- */
+
 .home-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: stretch; 
 }
+
+
 .card {
   background: #222;
   border: 2px solid var(--ui-accent);
   border-radius: 12px;
   padding: 20px;
   text-align: center;
+    flex: 1 1 calc(33.333% - 1.5rem); 
+  max-width: 300px;   
+}
+.home-container .card {
+  display: flex;              
+  flex-direction: column;    
+  justify-content: space-between; 
+  background: #222;
+  border: 2px solid var(--ui-accent);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  .home-container .card {
+    flex: 1 1 100%;
+  }
 }
 .card h2 { margin-top: 0; }
 .card .btn { margin-top: 10px; }
 
-/* --- PLAY PAGE (game.html) --- */
+
 .play-container {
   display: flex;
   flex-direction: column;
@@ -212,7 +238,7 @@ button:disabled {
   color: var(--ui-accent);
 }
 
-/* --- OPENINGS PAGE --- */
+
 .openings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -234,7 +260,7 @@ button:disabled {
   max-width: 80vw;
 }
 
-/* --- ACHIEVEMENTS PAGE --- */
+
 .achievements-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -249,7 +275,7 @@ button:disabled {
   text-align: center;
 }
 
-/* --- MAIN EVENT PAGE --- */
+
 .standings-table {
   width: 80%;
   margin: 20px auto;
@@ -277,7 +303,7 @@ button:disabled {
   cursor: pointer;
 }
 
-/* --- REPLAY MODAL --- */
+
 .replay-modal {
   display: none;
   position: fixed;
@@ -305,7 +331,7 @@ button:disabled {
   gap: 10px;
 }
 
-/* --- SETTINGS POPUP --- */
+
 .settings-icon {
   position: fixed;
   top: 10px;
@@ -352,7 +378,7 @@ button:disabled {
 .square.light { background: var(--board-light); }
 .square.dark { background: var(--board-dark); }
 
-/* --- FOOTER --- */
+
 .site-footer {
   text-align: center;
   padding: 15px;
@@ -368,7 +394,7 @@ button:disabled {
 }
 .site-footer a:hover { text-decoration: underline; }
 
-/* --- MOBILE RULES --- */
+
 @media (max-width: 600px) {
   body { font-size: 14px; }
   .site-header h1 { font-size: 22px; }
@@ -403,8 +429,8 @@ button:disabled {
   align-items: center;
   justify-content: center;
 
-  min-height: 100vh;       /* full screen */
-  padding-top: 60px;       /* leave room for navbar */
+  min-height: 100vh;       
+  padding-top: 60px;       
   box-sizing: border-box;
   text-align: center;
 }
@@ -433,7 +459,7 @@ button:disabled {
 }
 #board .square-55d63 { position: relative; }
 
-/* Generic highlight (selection & Weed) */
+
 
 
 #board .square-55d63.highlight-to::after {
@@ -443,10 +469,10 @@ button:disabled {
     inset 0 0 6px rgba(34,197,94,.85);
 }
 #board .square-55d63.highlight {
-  background: rgba(0, 128, 0, 0.6) !important;  /* dark green overlay */
+  background: rgba(0, 128, 0, 0.6) !important;  
 }
 #board .square-55d63.highlight-to {
-  background: rgba(0, 180, 0, 0.8) !important;  /* brighter green for "to" */
+  background: rgba(0, 180, 0, 0.8) !important;  
 }
 #pieceSetSelect {
   padding: 6px 10px;
@@ -470,7 +496,7 @@ body.mainevent main section {
   text-align: center;
 }
 
-/* Make the table nice and centered */
+
 .standings-table {
   border-collapse: collapse;
   margin: 1rem auto;
@@ -494,12 +520,12 @@ body.mainevent main section {
   color: #fff;
 }
 
-/* Remove last border */
+
 .standings-table tr:last-child td {
   border-bottom: none;
 }
 
-/* Games list centered */
+
 .game-list {
   list-style: none;
   padding: 0;
@@ -524,9 +550,9 @@ body.mainevent main section {
 
 
 
-/* --- MOBILE FRIENDLY FIXES --- */
+
 @media (max-width: 600px) {
-  /* Navbar turns into stacked buttons */
+ 
   .navbar ul {
     flex-direction: column;
     gap: 10px;
@@ -540,7 +566,7 @@ body.mainevent main section {
     padding: 10px;
   }
 
-  /* Cards and grids shrink neatly */
+
   .home-container,
   .openings-grid,
   .achievements-grid {
@@ -557,7 +583,7 @@ body.mainevent main section {
     box-sizing: border-box;
   }
 
-  /* Main Event tables/lists scroll instead of clipping */
+
   .standings-table {
     display: block;
     overflow-x: auto;
@@ -572,7 +598,7 @@ body.mainevent main section {
   }
 }
 
-/* achievment logic */ 
+
 .achievement-popup {
   position: fixed;
   bottom: 20px;
@@ -683,3 +709,44 @@ body.mainevent main section {
   }
   .navbar ul.show { max-height:500px; } 
 }
+
+#game-area {
+  position: relative;
+  width: 400px;   
+  height: 400px;
+  margin: 0 auto;
+  overflow: hidden; 
+}
+
+#background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  object-fit: cover;
+}
+
+#head {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  display: none;
+  cursor: pointer;
+  z-index: 2;
+  transition: bottom 0.3s ease-in-out; 
+}
+
+#hatch {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  cursor: pointer;
+  user-select: none;
+}
+
+
