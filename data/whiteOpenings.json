@@ -2,12 +2,12 @@
   "bird": {
     "name": "Bird’s Opening",
     "moves": ["f4", "d5", "Nf3", "Bg4"],
-    "description": "The Chad of flank pawn pushes."
+    "description": "imma play f4 bro i swear... plays E4"
   },
   "bongcloud": {
     "name": "Bongcloud",
-    "moves": ["e4", "e5", "Ke2", "Ke7"],
-    "description": "The cloud that always disappoints."
+    "moves": ["e4", "e5", "Ke2","Ke7","Ke1","Ke8","Ke2","Ke7","Ke1","Ke8"],
+    "description": "not the bong cloud."
   }
 }
 
