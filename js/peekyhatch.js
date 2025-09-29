@@ -3,6 +3,7 @@ let hatchClicks = 0;
 let hatchBroken = false;
 let gameOver = false;
 let firstHeadShown = false;
+let peekTimeout = null;
 
 const scoreEl = document.getElementById("score");
 const hatchEl = document.getElementById("hatch");
@@ -35,16 +36,16 @@ function peekCycle() {
 
   const hatchSize = gameArea.offsetWidth;
   const headSize = headEl.offsetWidth;
-
-
   const sides = ["top", "bottom", "left", "right"];
   const side = sides[Math.floor(Math.random() * sides.length)];
+
 
   headEl.style.top = "auto";
   headEl.style.bottom = "auto";
   headEl.style.left = "auto";
   headEl.style.right = "auto";
 
+ 
   if (side === "top") {
     const x = Math.floor(Math.random() * (hatchSize - headSize));
     headEl.style.left = x + "px";
@@ -77,37 +78,40 @@ function peekCycle() {
     setTimeout(() => { headEl.style.right = "0px"; }, 100);
   }
 
- 
   firstHeadShown = true;
-}
 
+  
+  if (peekTimeout) clearTimeout(peekTimeout);
+  peekTimeout = setTimeout(() => {
+    if (!gameOver) endGame(); 
+  }, 1100);
+}
 
 headEl.addEventListener("click", (e) => {
   if (gameOver) return;
+
   score += 100;
   updateScore();
   headEl.style.display = "none";
-  setTimeout(peekCycle, 1000);
-  e.stopPropagation(); 
-});
 
+  if (peekTimeout) clearTimeout(peekTimeout); 
+  setTimeout(peekCycle, 800); 
+  e.stopPropagation();
+});
 
 document.addEventListener("click", (e) => {
   if (!firstHeadShown || gameOver) return;
-
-
-  if (e.target !== headEl) {
+  if (e.target !== headEl && e.target !== hatchEl && e.target !== restartBtn) {
     endGame();
   }
 });
 
-
 function endGame() {
   gameOver = true;
+  if (peekTimeout) clearTimeout(peekTimeout);
   headEl.style.display = "none";
   updateScore("Game Over! You Missed, now hatch is open and we have a mira | Final Score: " + score);
 }
-
 
 restartBtn.addEventListener("click", () => {
   score = 0;
@@ -115,6 +119,7 @@ restartBtn.addEventListener("click", () => {
   hatchBroken = false;
   gameOver = false;
   firstHeadShown = false;
+  if (peekTimeout) clearTimeout(peekTimeout);
   updateScore();
 
   hatchEl.src = "images/hatch_closed.png";
