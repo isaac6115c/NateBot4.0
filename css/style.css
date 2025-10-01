@@ -751,5 +751,56 @@ body.mainevent main section {
 #game-area, #head, #hatch, #restartBtn {
   touch-action: manipulation;
 }
+.modal {
+  display: none; /* hidden by default */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 2px solid var(--ui-accent);
+  border-radius: var(--radius);
+  padding: 20px;
+  width: 280px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+}
+
+.modal-content input {
+  width: 80px;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 10px 0;
+  padding: 5px;
+  border: 2px solid var(--ui-accent);
+  border-radius: var(--radius);
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+
+.modal-actions {
+  margin-top: 10px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  background: var(--ui-accent);
+  border: none;
+  border-radius: var(--radius);
+  color: var(--ui-text);
+  cursor: pointer;
+}
 
 

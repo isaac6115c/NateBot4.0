@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PeekyHatch | NateBot 5.0</title>
+  <title>PeekyHatch | NateBot 5.0.1</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/nav.js"></script>
   <style>
@@ -116,10 +116,26 @@
     </div>
 
     <button id="restartBtn">Restart</button>
+
+    <section id="leaderboard">
+  <h2>🏆 Leaderboard</h2>
+  <ol id="leaderboard-list"></ol>
+</section>
+<div id="highscore-modal" class="modal">
+  <div class="modal-content">
+    <h2>New High Score!</h2>
+    <p>Enter your initials:</p>
+    <input type="text" id="playerName" maxlength="3" placeholder="AAA">
+    <div class="modal-actions">
+      <button id="saveScoreBtn">Save</button>
+    </div>
+  </div>
+</div>
+
   </main>
 
   <footer class="site-footer">
-    <p>NateBot 5.0 &mdash; <a href="patchnotes.html">Patch Notes</a></p>
+    <p>NateBot 5.0.1 &mdash; <a href="patchnotes.html">Patch Notes</a></p>
   </footer>
 
   <script src="js/peekyhatch.js"></script>
