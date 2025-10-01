@@ -804,3 +804,10 @@ body.mainevent main section {
 }
 
 
+.modal[aria-busy="true"] .modal-actions button,
+.modal[aria-busy="true"] input {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.modal[aria-busy="true"] { cursor: progress; }
+

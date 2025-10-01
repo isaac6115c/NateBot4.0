@@ -10,6 +10,9 @@ const hatchEl = document.getElementById("hatch");
 const headEl = document.getElementById("head");
 const restartBtn = document.getElementById("restartBtn");
 const gameArea = document.getElementById("game-area");
+const modal = document.getElementById("highscore-modal");
+const nameInput = document.getElementById("playerName");
+const saveBtn = document.getElementById("saveScoreBtn");
 
 const API_URL = "https://script.google.com/macros/s/AKfycbyp8Je4xi-0BX0co-Ng5j0KyzRbHq67yZ0Eln4zIUP9vjd6940CShyNJHGm8cmg3NkuxA/exec";
 
@@ -57,27 +60,60 @@ async function renderLeaderboard() {
 
 async function tryAddHighScore(finalScore) {
   const data = await loadLeaderboard();
+  const qualifies = (data.length < 10) || (finalScore > data[data.length - 1].score);
+  if (!qualifies) return;
 
-  if (data.length < 10 || finalScore > data[data.length - 1].score) {
   
-    const modal = document.getElementById("highscore-modal");
-    const nameInput = document.getElementById("playerName");
-    const saveBtn = document.getElementById("saveScoreBtn");
+  modal.style.display = "flex";
+  nameInput.value = "AAA";
+  nameInput.focus();
 
-    modal.style.display = "flex";
-    nameInput.value = "AAA";
-    nameInput.focus();
+  let submitting = false;
 
-    saveBtn.onclick = async () => {
-      let name = nameInput.value || "???";
-      name = name.toUpperCase().slice(0, 3);
+  const handleSubmit = async () => {
+    if (submitting) return;          
+    submitting = true;
 
-      await saveScore(name, finalScore);
+    
+    modal.setAttribute("aria-busy", "true");
+    saveBtn.disabled = true;
+    nameInput.disabled = true;
+
+    
+    let name = (nameInput.value || "???").toUpperCase().slice(0, 3);
+
+    try {
+      await saveScore(name, finalScore); 
+    } catch (err) {
+      console.error("Save failed:", err);
+    } finally {
+    
       modal.style.display = "none";
-      renderLeaderboard();
-    };
-  }
+      modal.removeAttribute("aria-busy");
+      saveBtn.disabled = false;
+      nameInput.disabled = false;
+      submitting = false;
+    }
+
+    
+    renderLeaderboard();
+
+    saveBtn.removeEventListener("click", clickOnce);
+    nameInput.removeEventListener("keydown", enterOnce);
+  };
+
+  const clickOnce = () => handleSubmit();
+  const enterOnce = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  saveBtn.addEventListener("click", clickOnce);
+  nameInput.addEventListener("keydown", enterOnce);
 }
+
 
 
 
